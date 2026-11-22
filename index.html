@@ -52,35 +52,41 @@ html, body {
   bottom: 100px;
   transform: translateX(-50%);
 }
-#controls {
-  position: fixed;
-  bottom: 25px;
-  left: 25px;
-  display: flex;
-  gap: 15px;
-  z-index: 100;
-}
 
-.move-btn {
-  width: 75px;
-  height: 75px;
-  border: none;
+/* ジョイスティックの外側 */
+#joystick {
+  position: fixed;
+  bottom: 35px;
+  left: 30px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
-  background: #333a;
-  color: white;
-  font-size: 30px;
-  font-weight: bold;
+  background: rgba(0, 0, 0, 0.25);
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  z-index: 100;
   touch-action: none;
   user-select: none;
-  -webkit-user-select: none;
 }
+
+/* ジョイスティックの内側 */
+#stick {
+  position: absolute;
+  width: 55px;
+  height: 55px;
+  left: 50%;
+  top: 50%;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
 </style>
 </head>
 <body>
 <div id="ground"></div>
-<div id="controls">
-  <button class="move-btn" id="leftBtn">◀</button>
-  <button class="move-btn" id="rightBtn">▶</button>
+<div id="joystick">
+  <div id="stick"></div>
 </div>
 
 <div id="character">
@@ -170,50 +176,66 @@ function updatePhysics() {
 
 updatePhysics();
 
-// 左右移動
-let moveLeft = false;
-let moveRight = false;
 
-let playerX = window.innerWidth / 2;
-const moveSpeed = 3;
+// ジョイスティック
+const joystick = document.getElementById("joystick");
+const stick = document.getElementById("stick");
 
-const leftBtn = document.getElementById("leftBtn");
-const rightBtn = document.getElementById("rightBtn");
+let joystickX = 0;
+let joystickActive = false;
 
-// ボタンを押したとき
-function setupButton(button, direction) {
-  button.addEventListener("pointerdown", e => {
-    e.preventDefault();
-    button.setPointerCapture(e.pointerId);
+const maxDistance = 40;
 
-    if (direction === "left") moveLeft = true;
-    if (direction === "right") moveRight = true;
-  });
+// 指を動かしたとき
+function updateJoystick(e) {
+  const rect = joystick.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
 
-  function stop() {
-    if (direction === "left") moveLeft = false;
-    if (direction === "right") moveRight = false;
-  }
+  let dx = e.clientX - centerX;
 
-  button.addEventListener("pointerup", stop);
-  button.addEventListener("pointercancel", stop);
-  button.addEventListener("lostpointercapture", stop);
+  dx = Math.max(-maxDistance, Math.min(maxDistance, dx));
+
+  joystickX = dx / maxDistance;
+
+  stick.style.left = `calc(50% + ${dx}px)`;
 }
 
-setupButton(leftBtn, "left");
-setupButton(rightBtn, "right");
+joystick.addEventListener("pointerdown", e => {
+  e.preventDefault();
+  joystickActive = true;
+  joystick.setPointerCapture(e.pointerId);
+  updateJoystick(e);
+});
 
-// 毎フレーム移動
+joystick.addEventListener("pointermove", e => {
+  if (joystickActive) updateJoystick(e);
+});
+
+function resetJoystick() {
+  joystickActive = false;
+  joystickX = 0;
+  stick.style.left = "50%";
+}
+
+joystick.addEventListener("pointerup", resetJoystick);
+joystick.addEventListener("pointercancel", resetJoystick);
+joystick.addEventListener("lostpointercapture", resetJoystick);
+
+// キャラクターの移動
+let playerX = window.innerWidth / 2;
+const moveSpeed = 4;
+
 function updateMovement() {
-  if (moveLeft) playerX -= moveSpeed;
-  if (moveRight) playerX += moveSpeed;
+  // 少しだけ倒した場合は動かない
+  if (Math.abs(joystickX) > 0.15) {
+    playerX += joystickX * moveSpeed;
+  }
 
-  // 画面外に出ないようにする
-  const characterWidth = character.offsetWidth;
+  const halfWidth = character.offsetWidth / 2;
 
   playerX = Math.max(
-    characterWidth / 2,
-    Math.min(window.innerWidth - characterWidth / 2, playerX)
+    halfWidth,
+    Math.min(window.innerWidth - halfWidth, playerX)
   );
 
   character.style.left = playerX + "px";
@@ -222,13 +244,5 @@ function updateMovement() {
 }
 
 updateMovement();
-if (moveLeft && !moveRight) {
-  character.style.transform =
-    "translateX(-50%) scaleX(-1)";
-} else if (moveRight && !moveLeft) {
-  character.style.transform =
-    "translateX(-50%) scaleX(1)";
-}
-
 
 </script>
