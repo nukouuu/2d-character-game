@@ -52,10 +52,36 @@ html, body {
   bottom: 100px;
   transform: translateX(-50%);
 }
+#controls {
+  position: fixed;
+  bottom: 25px;
+  left: 25px;
+  display: flex;
+  gap: 15px;
+  z-index: 100;
+}
+
+.move-btn {
+  width: 75px;
+  height: 75px;
+  border: none;
+  border-radius: 50%;
+  background: #333a;
+  color: white;
+  font-size: 30px;
+  font-weight: bold;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
 </style>
 </head>
 <body>
 <div id="ground"></div>
+<div id="controls">
+  <button class="move-btn" id="leftBtn">◀</button>
+  <button class="move-btn" id="rightBtn">▶</button>
+</div>
 
 <div id="character">
   <img class="part" id="tail" src="tail.PNG">
@@ -143,5 +169,59 @@ function updatePhysics() {
 }
 
 updatePhysics();
+
+// 左右移動
+let moveLeft = false;
+let moveRight = false;
+
+let playerX = window.innerWidth / 2;
+const moveSpeed = 3;
+
+const leftBtn = document.getElementById("leftBtn");
+const rightBtn = document.getElementById("rightBtn");
+
+// ボタンを押したとき
+function setupButton(button, direction) {
+  button.addEventListener("pointerdown", e => {
+    e.preventDefault();
+    button.setPointerCapture(e.pointerId);
+
+    if (direction === "left") moveLeft = true;
+    if (direction === "right") moveRight = true;
+  });
+
+  function stop() {
+    if (direction === "left") moveLeft = false;
+    if (direction === "right") moveRight = false;
+  }
+
+  button.addEventListener("pointerup", stop);
+  button.addEventListener("pointercancel", stop);
+  button.addEventListener("lostpointercapture", stop);
+}
+
+setupButton(leftBtn, "left");
+setupButton(rightBtn, "right");
+
+// 毎フレーム移動
+function updateMovement() {
+  if (moveLeft) playerX -= moveSpeed;
+  if (moveRight) playerX += moveSpeed;
+
+  // 画面外に出ないようにする
+  const characterWidth = character.offsetWidth;
+
+  playerX = Math.max(
+    characterWidth / 2,
+    Math.min(window.innerWidth - characterWidth / 2, playerX)
+  );
+
+  character.style.left = playerX + "px";
+
+  requestAnimationFrame(updateMovement);
+}
+
+updateMovement();
+
 
 </script>
