@@ -83,6 +83,33 @@ html, body {
 #head {
   transform-origin: center center;
 }
+
+/* 待機中の呼吸アニメーション */
+@keyframes breathing {
+  0% {
+    transform: scale(1, 1);
+  }
+
+  50% {
+    transform: scale(1.025, 1.015);
+  }
+
+  100% {
+    transform: scale(1, 1);
+  }
+}
+
+/* 胴体だけをゆっくり動かす */
+#body {
+  transform-origin: center center;
+  animation: breathing 3s ease-in-out infinite;
+}
+
+/* 歩いている間は呼吸を停止 */
+#character.walking #body {
+  animation: none;
+}
+
 </style>
 </head>
 <body>
@@ -347,6 +374,7 @@ armFrames.forEach(src => {
 
 function updateWalkAnimation(time) {
   const isWalking = Math.abs(joystickX) > 0.15;
+  character.classList.toggle("walking", isWalking);
 
   if (isWalking) {
     if (!wasWalking || time - lastWalkTime > 120) {
