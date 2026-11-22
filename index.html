@@ -255,6 +255,15 @@ let playerX = window.innerWidth / 2;
 const moveSpeed = 4;
 
 function updateMovement() {
+  // 移動方向に合わせてしっぽを反転
+  if (joystickX > 0.15) {
+    // 右に歩くときは左側へ
+    tail.style.transform = "scaleX(-1)";
+  } else if (joystickX < -0.15) {
+    // 左に歩くときは右側へ
+    tail.style.transform = "scaleX(1)";
+  }
+
   // 少しだけ倒した場合は動かない
   if (Math.abs(joystickX) > 0.15) {
     playerX += joystickX * moveSpeed;
