@@ -249,14 +249,12 @@ playerX = Math.max(
   Math.min(window.innerWidth - halfWidth, playerX)
 );
 
-// 壁にぶつかった方向に合わせて頭を反転
-if (rightWall) {
+if (isHittingWall && rightWall) {
   head.style.transform = "scaleX(-1)";
 } else {
   head.style.transform = "scaleX(1)";
 }
 
-// 頭のアニメーションを更新
 updateHeadAnimation(isHittingWall, performance.now());
 
   character.style.left = playerX + "px";
