@@ -245,4 +245,45 @@ function updateMovement() {
 
 updateMovement();
 
+const feet = document.getElementById("feet");
+
+const walkFrames = [
+  "feet_right1.PNG",
+  "feet_right2.PNG",
+  "feet_left1.PNG",
+  "feet_left2.PNG"
+];
+
+let walkFrame = 0;
+let lastWalkTime = 0;
+let wasWalking = false;
+
+// 画像を事前に読み込む
+walkFrames.forEach(src => {
+  const img = new Image();
+  img.src = src;
+});
+
+function updateWalkAnimation(time) {
+  const isWalking = Math.abs(joystickX) > 0.15;
+
+  if (isWalking) {
+    if (!wasWalking || time - lastWalkTime > 120) {
+      feet.src = walkFrames[walkFrame];
+      walkFrame = (walkFrame + 1) % walkFrames.length;
+      lastWalkTime = time;
+    }
+  } else if (wasWalking) {
+    feet.src = "feet.PNG";
+    walkFrame = 0;
+  }
+
+  wasWalking = isWalking;
+
+  requestAnimationFrame(updateWalkAnimation);
+}
+
+requestAnimationFrame(updateWalkAnimation);
+
+
 </script>
