@@ -239,9 +239,7 @@ const leftWall = playerX <= halfWidth;
 const rightWall = playerX >= window.innerWidth - halfWidth;
 
 // 壁に向かって移動しているか
-const isHittingWall =
-  (leftWall && joystickX < -0.15) ||
-  (rightWall && joystickX > 0.15);
+const isHittingWall = leftWall || rightWall;
 
 // 画面外に出ないようにする
 playerX = Math.max(
