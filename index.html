@@ -80,7 +80,9 @@ html, body {
   transform: translate(-50%, -50%);
   pointer-events: none;
 }
-
+#head {
+  transform-origin: center center;
+}
 </style>
 </head>
 <body>
@@ -247,9 +249,15 @@ playerX = Math.max(
   Math.min(window.innerWidth - halfWidth, playerX)
 );
 
-// 顔のアニメーションを更新
-updateHeadAnimation(isHittingWall, performance.now());
+// 壁にぶつかった方向に合わせて頭を反転
+if (rightWall) {
+  head.style.transform = "scaleX(-1)";
+} else {
+  head.style.transform = "scaleX(1)";
+}
 
+// 頭のアニメーションを更新
+updateHeadAnimation(isHittingWall, performance.now());
 
   character.style.left = playerX + "px";
 
