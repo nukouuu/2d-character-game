@@ -249,14 +249,23 @@ playerX = Math.max(
   Math.min(window.innerWidth - halfWidth, playerX)
 );
 
+// 右の壁に接触したら反転
 if (isHittingWall && rightWall) {
   head.style.transform = "scaleX(-1)";
-} else {
+}
+
+// 左の壁に接触したら通常の向き
+if (isHittingWall && leftWall) {
   head.style.transform = "scaleX(1)";
 }
 
+// 顔のアニメーションを更新
 updateHeadAnimation(isHittingWall, performance.now());
 
+// 顔が完全に元に戻ったら反転を解除
+if (!isHittingWall && headFrame === 0) {
+  head.style.transform = "scaleX(1)";
+}
   character.style.left = playerX + "px";
 
   requestAnimationFrame(updateMovement);
