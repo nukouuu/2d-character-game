@@ -233,15 +233,72 @@ function updateMovement() {
 
   const halfWidth = character.offsetWidth / 2;
 
-  playerX = Math.max(
-    halfWidth,
-    Math.min(window.innerWidth - halfWidth, playerX)
-  );
+  
+// 左右の壁との接触判定
+const leftWall = playerX <= halfWidth;
+const rightWall = playerX >= window.innerWidth - halfWidth;
+
+// 壁に向かって移動しているか
+const isHittingWall =
+  (leftWall && joystickX < -0.15) ||
+  (rightWall && joystickX > 0.15);
+
+// 画面外に出ないようにする
+playerX = Math.max(
+  halfWidth,
+  Math.min(window.innerWidth - halfWidth, playerX)
+);
+
+// 顔のアニメーションを更新
+updateHeadAnimation(isHittingWall, performance.now());
+
 
   character.style.left = playerX + "px";
 
   requestAnimationFrame(updateMovement);
 }
+
+// 壁にぶつかったときの頭アニメーション
+const head = document.getElementById("head");
+
+const headFrames = [
+  "head.PNG",
+  "head_hit1.PNG",
+  "head_hit2.PNG"
+];
+
+// 画像を事前に読み込む
+headFrames.forEach(src => {
+  const img = new Image();
+  img.src = src;
+});
+
+let headFrame = 0;
+let headTimer = 0;
+let wasHittingWall = false;
+
+function updateHeadAnimation(isHittingWall, time) {
+  if (isHittingWall) {
+    if (!wasHittingWall) {
+      headFrame = 0;
+      headTimer = time;
+    }
+
+    if (time - headTimer >= 100 && headFrame < 2) {
+      headFrame++;
+      head.src = headFrames[headFrame];
+      headTimer = time;
+    }
+  } else {
+    if (wasHittingWall) {
+      headFrame = 0;
+      head.src = headFrames[0];
+    }
+  }
+
+  wasHittingWall = isHittingWall;
+}
+
 
 updateMovement();
 
