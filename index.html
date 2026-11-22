@@ -53,16 +53,18 @@ html, body {
   <img class="part" id="mouth" src="mouth.PNG">
 </div>
 
+
 <script>
 const eyes = document.getElementById("eyes");
 
 const eyeFrames = [
   "eyes_open.PNG",
   "eyes_half.PNG",
-  "eyes_closed.PNG",
-  "eyes_half.PNG",
-  "eyes_open. PNG"
+  "eyes_closed.PNG"
 ];
+
+// 最初は必ず目を開く
+eyes.src = eyeFrames[0];
 
 // 画像を事前に読み込む
 eyeFrames.forEach(src => {
@@ -70,27 +72,34 @@ eyeFrames.forEach(src => {
   img.src = src;
 });
 
-// まばたき
 function blink() {
-  let frame = 0;
+  // 半分閉じる
+  eyes.src = eyeFrames[1];
 
-  function nextFrame() {
-    eyes.src = eyeFrames[frame];
-    frame++;
+  setTimeout(() => {
+    // 完全に閉じる
+    eyes.src = eyeFrames[2];
 
-    if (frame < eyeFrames.length) {
-      setTimeout(nextFrame, 70);
-    } else {
-      const delay = 2000 + Math.random() * 3000;
-      setTimeout(blink, delay);
-    }
-  }
+    setTimeout(() => {
+      // 半分開く
+      eyes.src = eyeFrames[1];
 
-  nextFrame();
+      setTimeout(() => {
+        // 完全に開く
+        eyes.src = eyeFrames[0];
+
+        // 次のまばたきまで2〜5秒待つ
+        scheduleBlink();
+      }, 80);
+    }, 100);
+  }, 80);
 }
 
-setTimeout(blink, 2000);
-</script>
+function scheduleBlink() {
+  const delay = 2000 + Math.random() * 3000;
+  setTimeout(blink, delay);
+}
 
-</body>
-</html>
+// 最初のまばたきまで待機
+scheduleBlink();
+</script>
