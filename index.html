@@ -276,27 +276,22 @@ let headTimer = 0;
 let wasHittingWall = false;
 
 function updateHeadAnimation(isHittingWall, time) {
-  if (isHittingWall) {
-    if (!wasHittingWall) {
-      headFrame = 0;
-      headTimer = time;
+  const targetFrame = isHittingWall ? 2 : 0;
+
+  // 100ミリ秒ごとに1段階ずつ切り替える
+  if (headFrame !== targetFrame && time - headTimer >= 100) {
+    if (headFrame < targetFrame) {
+      headFrame++;
+    } else {
+      headFrame--;
     }
 
-    if (time - headTimer >= 100 && headFrame < 2) {
-      headFrame++;
-      head.src = headFrames[headFrame];
-      headTimer = time;
-    }
-  } else {
-    if (wasHittingWall) {
-      headFrame = 0;
-      head.src = headFrames[0];
-    }
+    head.src = headFrames[headFrame];
+    headTimer = time;
   }
 
   wasHittingWall = isHittingWall;
 }
-
 
 updateMovement();
 
