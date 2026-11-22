@@ -449,6 +449,46 @@ function updateTailAnimation(time) {
 
 requestAnimationFrame(updateTailAnimation);
 
+const body = document.getElementById("body");
+
+const bodyWalkFrames = [
+  "body.PNG",
+  "body_walk.PNG"
+];
+
+// 画像を事前に読み込む
+bodyWalkFrames.forEach(src => {
+  const img = new Image();
+  img.src = src;
+});
+
+let bodyFrame = 0;
+let lastBodyTime = 0;
+let wasBodyWalking = false;
+
+function updateBodyAnimation(time) {
+  const isWalking = Math.abs(joystickX) > 0.15;
+
+  if (isWalking) {
+    if (!wasBodyWalking || time - lastBodyTime >= 120) {
+      body.src = bodyWalkFrames[bodyFrame];
+
+      bodyFrame = (bodyFrame + 1) % bodyWalkFrames.length;
+      lastBodyTime = time;
+    }
+  } else if (wasBodyWalking) {
+    // 停止したら元の画像に戻す
+    body.src = "body.PNG";
+    bodyFrame = 0;
+  }
+
+  wasBodyWalking = isWalking;
+
+  requestAnimationFrame(updateBodyAnimation);
+}
+
+requestAnimationFrame(updateBodyAnimation);
+
 
 
 </script>
