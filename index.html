@@ -55,6 +55,7 @@ html, body {
 </style>
 </head>
 <body>
+<div id="ground"></div>
 
 <div id="character">
   <img class="part" id="tail" src="tail.PNG">
@@ -116,4 +117,30 @@ function scheduleBlink() {
 
 // 最初のまばたきまで待機
 scheduleBlink();
+  
+const character = document.getElementById("character");
+
+const groundHeight = 100;
+const gravity = 0.5;
+
+let velocityY = 0;
+let characterY = 200;
+
+function updatePhysics() {
+  velocityY += gravity;
+  characterY -= velocityY;
+
+  // 地面との当たり判定
+  if (characterY <= groundHeight) {
+    characterY = groundHeight;
+    velocityY = 0;
+  }
+
+  character.style.bottom = characterY + "px";
+
+  requestAnimationFrame(updatePhysics);
+}
+
+updatePhysics();
+
 </script>
