@@ -405,5 +405,50 @@ function updateWalkAnimation(time) {
 
 requestAnimationFrame(updateWalkAnimation);
 
+const tail = document.getElementById("tail");
+
+const tailWalkFrames = [
+  "tail_walk1.PNG",
+  "tail_walk2.PNG",
+  "tail_walk3.PNG",
+  "tail_walk4.PNG",
+  "tail_walk5.PNG",
+  "tail_walk6.PNG"
+];
+
+// 画像を事前に読み込む
+tailWalkFrames.forEach(src => {
+  const img = new Image();
+  img.src = src;
+});
+
+let tailFrame = 0;
+let lastTailTime = 0;
+let wasTailWalking = false;
+
+function updateTailAnimation(time) {
+  const isWalking = Math.abs(joystickX) > 0.15;
+
+  if (isWalking) {
+    if (!wasTailWalking || time - lastTailTime >= 100) {
+      tail.src = tailWalkFrames[tailFrame];
+
+      tailFrame = (tailFrame + 1) % tailWalkFrames.length;
+      lastTailTime = time;
+    }
+  } else if (wasTailWalking) {
+    // 停止したら通常のしっぽに戻す
+    tail.src = "tail.PNG";
+    tailFrame = 0;
+  }
+
+  wasTailWalking = isWalking;
+
+  requestAnimationFrame(updateTailAnimation);
+}
+
+requestAnimationFrame(updateTailAnimation);
+
+
 
 </script>
