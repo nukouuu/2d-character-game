@@ -1,0 +1,96 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2Dゲーム</title>
+<style>
+html, body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #dceef7;
+}
+
+#character {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.part {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+#tail { z-index: 1; }
+#feet { z-index: 2; }
+#body { z-index: 3; }
+#arm { z-index: 4; }
+#head { z-index: 5; }
+#eyes { z-index: 6; }
+#eyebrow { z-index: 7; }
+#mouth { z-index: 8; }
+</style>
+</head>
+<body>
+
+<div id="character">
+  <img class="part" id="tail" src="tail.png">
+  <img class="part" id="feet" src="feet.png">
+  <img class="part" id="body" src="body.png">
+  <img class="part" id="arm" src="arm.png">
+  <img class="part" id="head" src="head.png">
+  <img class="part" id="eyes" src="eyes_open.png">
+  <img class="part" id="eyebrow" src="eyebrow.png">
+  <img class="part" id="mouth" src="mouth.png">
+</div>
+
+<script>
+const eyes = document.getElementById("eyes");
+
+const eyeFrames = [
+  "eyes_open.png",
+  "eyes_half.png",
+  "eyes_closed.png",
+  "eyes_half.png",
+  "eyes_open.png"
+];
+
+// 画像を事前に読み込む
+eyeFrames.forEach(src => {
+  const img = new Image();
+  img.src = src;
+});
+
+// まばたき
+function blink() {
+  let frame = 0;
+
+  function nextFrame() {
+    eyes.src = eyeFrames[frame];
+    frame++;
+
+    if (frame < eyeFrames.length) {
+      setTimeout(nextFrame, 70);
+    } else {
+      const delay = 2000 + Math.random() * 3000;
+      setTimeout(blink, delay);
+    }
+  }
+
+  nextFrame();
+}
+
+setTimeout(blink, 2000);
+</script>
+
+</body>
+</html>
